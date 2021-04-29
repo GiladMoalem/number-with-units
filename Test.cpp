@@ -10,10 +10,14 @@ using namespace std;
 #include "NumberWithUnits.hpp"
 using namespace ariel;
 
+
 TEST_CASE("try"){
+ifstream units_file{"units.txt"};
+NumberWithUnits::read_units(units_file);
+
     NumberWithUnits a{2, "km"}; 
-    CHECK((a==a));
-    CHECK((a*3).operator==(a));
+    CHECK((a.operator==(a)));
+    CHECK(!(a*3).operator==(a));
 }
 
 
@@ -64,7 +68,7 @@ TEST_CASE("input"){
     stringstream iss {"700 [kg]"};
     NumberWithUnits a{2,""};
     CHECK_NOTHROW (iss >> a);
-    CHECK((a == NumberWithUnits{700,"[kg]"} ));
+    CHECK((a == NumberWithUnits{700,"kg"} ));
 
     stringstream is2 {"sds700 [kg]"};
     CHECK_THROWS(is2 >> a); 

@@ -6,22 +6,22 @@
  */
 
 #include <iostream>
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
-using namespace std;
-
-#include "NumberWithUnits.hpp"
+#include <fstream>   
+#include <sstream> 
+#include <stdexcept> 
+using namespace std;  
+   
+#include "NumberWithUnits.hpp"   
 using namespace ariel;
-
-int main() {
-  ifstream units_file{"units.txt"};
+    
+int main() {  
+  ifstream units_file{"units.txt"};  
   NumberWithUnits::read_units(units_file);
-
+ 
   NumberWithUnits a{2, "km"};   // 2 kilometers
   cout << a << endl;           // Prints "2[km]".
-  cout << (-a) << endl;    // Prints "-2[km]"
-  cout << (3*a) << endl;    // Prints "6[km]"
+  cout << (a--) << endl;    // Prints "-2[km]"   
+  cout << (3*a) << endl;    // Prints "6[km]"      
 
   NumberWithUnits b{300, "m"};  // 300 meters
   cout << (a+b) << endl;   // Prints "2.3[km]". Note: units are determined by first number (a).
@@ -32,7 +32,7 @@ int main() {
   cout << (a<=b) << endl;  // Prints "false"
   cout << (a==NumberWithUnits{2000, "m"}) << endl;  // Prints "true"
 
-  istringstream sample_input{" 3[ kg ] "};
+  istringstream sample_input{" 700[ kg ] "};
   try{sample_input >> a;
   }catch(const std::exception& ex){
     cout << ex.what() << endl; // Prints "Units do not match - [m] cannot be converted to [kg]"
