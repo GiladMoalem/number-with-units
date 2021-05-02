@@ -30,12 +30,6 @@ class NumberWithUnits{
     NumberWithUnits operator -(); //negative 
     NumberWithUnits operator -=(const NumberWithUnits num);
 
-    // bool operator ==(const NumberWithUnits num);
-    // bool operator >=(const NumberWithUnits num);
-    // bool operator >(const NumberWithUnits num);
-    // bool operator <(const NumberWithUnits num);
-    // bool operator <=(const NumberWithUnits num);
-    // bool operator !=(const NumberWithUnits num);
 
     friend  bool operator ==(const NumberWithUnits num1,const NumberWithUnits num2);
     friend  bool operator !=(const NumberWithUnits num1,const NumberWithUnits num2);

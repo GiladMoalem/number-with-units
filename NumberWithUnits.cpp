@@ -5,7 +5,8 @@
 #include <stdexcept>
 #include <ostream>
 #include <cmath>
-#include <list>
+#include <stack>
+#include <set>
 typedef map<string,map<string,double>> Map;
 
 namespace ariel{
@@ -13,84 +14,37 @@ namespace ariel{
     static Map compare_map;
 void print();
 
-    
 
-static void func_for_fill_the_deep_map( map<string,double>& main_map, Map& map1, string word){
-    map<string,double>::iterator itr;
-    for (itr = map1[word].begin(); itr != map1[word].end(); itr++)
-    {
-        if(true||main_map.find(itr->first) == main_map.end() ){//if the neighbor not in the new map
-            main_map[itr->first] = (itr->second) * (main_map[word]);
-            //main_map["cm"] = map1["m"]["cm"](100) * main_map["m"](1000)
-            func_for_fill_the_deep_map(main_map, map1, itr->first);
+static double ezer2(string src, string dest){
+    set<string> visited;
+    compare_map[src][src] = 1;
+    if(src==dest) return 1;
+    visited.insert(src);
+
+    stack<string> wait;
+    wait.push(src);
+    string word = src;
+    
+    while(!wait.empty()){
+        word = wait.top();
+        wait.pop();
+        
+        for(auto& n:compare_map[word]){
+            if(visited.find(n.first) == visited.end()){
+                
+                compare_map[src][n.first] = compare_map[src][word] * compare_map[word][n.first];
+                compare_map[n.first][src] = 1 / compare_map[src][n.first];
+                
+                if(n.first == dest)return compare_map[src][n.first];
+
+                wait.push(n.first);
+                visited.insert(n.first);
+            }
         }
     }
-}/*
-static void ezer2(Map& map1,Map& map2){
-    Map::iterator itr1;
-    map<string,double>::iterator itr2;
-    for(itr1 =map1.begin(); itr1!=map1.end(); itr1++){
-        map<string,bool> child;
-        map<string,bool> father;
-        LinkedList<string> wait;
-
-        for(itr2 = itr1->second.begin(); itr2 != itr1->second.end(); itr2++){
-            compare_map[itr1->first][itr2->first]= itr2-> second;
-            wait.insert((itr2->first));
-        }
+    return -1;
     }
 
-}*/
-static void ezer(Map& map1,Map& map2){
-    
-    // Map result;
-    Map::iterator itr1,start_itr;
-    map<string,double>::iterator itr2;
-    // map["km"]["km"] = 1.
-    for (start_itr = map1.begin(); start_itr != map1.end(); start_itr++){//"kg" <"kg",1>
-        compare_map[start_itr ->first][start_itr ->first] =1.0;
-    }
-    for (start_itr = map2.begin(); start_itr != map2.end(); start_itr++){//"kg" <"kg",1>
-        compare_map[start_itr ->first][start_itr ->first] =1.0;
-    }
-    
-
-    for (itr1 = map1.begin(); itr1 != map1.end(); itr1++){
-        for(itr2 = map1[itr1 ->first].begin(); itr2 != map1[itr1 -> first].end(); itr2++ ){//for the deep map
-            string word1 = itr1 -> first, word2 = itr2 -> first;
-            compare_map[itr1 -> first][itr2 ->first] = itr2 -> second; // "km",(<"m",1000>,<"cm",100000>)
-            // gets map, map(map), string key
-            // insert to the map the all friends with the string key
-            // and does that again recirsivly 
-            func_for_fill_the_deep_map(compare_map[itr1 ->first], map1, word2);
-            func_for_fill_the_deep_map(compare_map[itr1 ->first], map2, word2);
-        }
-        // gets map, map(map), string key
-        // insert to the map the values mmap
-        // and does that recursivly
-        func_for_fill_the_deep_map(compare_map[itr1->first], map2, itr1->first);
-
-    }
-
-    for (itr1 = map2.begin(); itr1 != map2.end(); itr1++){
-        for(itr2 = map2[itr1 ->first].begin(); itr2 != map2[itr1 -> first].end(); itr2++ ){//for the deep map
-            string word1 = itr1 -> first, word2 = itr2 -> first;
-            compare_map[itr1 -> first][itr2 ->first] = itr2 -> second; // "km",(<"m",1000>,<"cm",100000>)
-            // gets map, map(map), string key
-            // insert to the map the all friends with the string key
-            // and does that again recirsivly 
-            func_for_fill_the_deep_map(compare_map[itr1 ->first], map1, word2);
-        }
-        // gets map, map(map), string key
-        // insert to the map the values mmap
-        // and does that recursivly
-        func_for_fill_the_deep_map(compare_map[itr1->first], map2, itr1->first);
-    }
-
-
-    
-    
-}
 
 
     NumberWithUnits::NumberWithUnits(double num, string unit){
@@ -101,25 +55,25 @@ static void ezer(Map& map1,Map& map2){
 
      void NumberWithUnits::read_units(ifstream& units_file){
         // compare_map.clear();
-        map <string,map <string,double>> sizes;
-        map <string,map <string,double>> sizes_rev;
+        
         
         string word1,word2;
         double n1,n2;
         char c;
         while(units_file >>n1 >> word1>> c >>n2 >> word2){
-            sizes[word1][word2] = n2;
-            sizes_rev[word2][word1] = 1/n2;
+            compare_map[word1][word1] = 1;
+            compare_map[word2][word2] = 1;
+            compare_map[word1][word2] = 1/n2;
+            compare_map[word2][word1] = n2;
         }
-        ezer(sizes,sizes_rev);
-print();
-cout<<endl<<endl;
+// print();
+// cout<<endl<<endl;
 
      }
     
     NumberWithUnits NumberWithUnits::operator +(const NumberWithUnits num){
-        if(compare_map[this->unit][num.unit]== 0)throw invalid_argument("the two numbers not comparable");
-        NumberWithUnits ans( (number + ( num.number/  compare_map[unit][num.unit] )), unit );
+        if(ezer2(unit,num.unit)<0)throw invalid_argument("the two numbers not comparable");
+        NumberWithUnits ans( (number + ( num.number * compare_map[unit][num.unit] )), unit );
         return ans;
         }
     //posetive
@@ -127,13 +81,13 @@ cout<<endl<<endl;
         return *this;
     }
     NumberWithUnits NumberWithUnits::operator +=(const NumberWithUnits num){ 
-        if(compare_map[this->unit][num.unit]== 0)throw invalid_argument("the two numbers not comparable");
-        number = number +(num.number/compare_map[unit][num.unit]);
+        if(ezer2(unit,num.unit)<0)throw invalid_argument("the two numbers not comparable");
+        number = number +(num.number*compare_map[unit][num.unit]);
         return *this;
     }
     NumberWithUnits NumberWithUnits::operator -(const NumberWithUnits num){
-        if(compare_map[this->unit][num.unit]== 0)throw invalid_argument("the two numbers not comparable");
-        NumberWithUnits ans( (number - ( num.number/  compare_map[unit][num.unit] )), unit );
+        if(ezer2(unit,num.unit)<0)throw invalid_argument("the two numbers not comparable");
+        NumberWithUnits ans( (number - ( num.number * compare_map[unit][num.unit] )), unit );
         return ans;
         }
 //negative
@@ -143,43 +97,27 @@ cout<<endl<<endl;
         return neg;
     }
     NumberWithUnits NumberWithUnits::operator -=(const NumberWithUnits num){
-        if(compare_map[this->unit][num.unit]== 0)throw invalid_argument("the two numbers not comparable");
-        number = number -(num.number/compare_map[unit][num.unit]);
+        if(ezer2(unit,num.unit)<0) throw invalid_argument("the two numbers not comparable");
+        number = number -(num.number*compare_map[unit][num.unit]);
         return *this;
     }
-/*
-    bool NumberWithUnits::operator ==(const NumberWithUnits num){
-        return number == (num.number / compare_map[unit][num.unit]);
-    }
-    bool NumberWithUnits::operator >=(const NumberWithUnits num){
-        return number >= num.number / compare_map[unit][num.unit];}
-    bool NumberWithUnits::operator >(const NumberWithUnits num){
-        return number > num.number / compare_map[unit][num.unit];}
 
-    bool NumberWithUnits::operator <(const NumberWithUnits num){
-        return number < num.number / compare_map[unit][num.unit];}
-    bool NumberWithUnits::operator <=(const NumberWithUnits num){
-        return number <= num.number / compare_map[unit][num.unit];}
-    bool NumberWithUnits::operator !=(const NumberWithUnits num){
-        return number != num.number / compare_map[unit][num.unit];
-    }
-*/
     bool operator ==(const NumberWithUnits num1,const NumberWithUnits num2){
-        if(!compare(num1,num2,0)) throw invalid_argument("this units uncomparable");
-        double dist = compare(num1, num2);
+        if( ezer2(num1.unit, num2.unit)<0 ) throw invalid_argument("this units uncomparable");
+        double dist = num1.number - num2.number * compare_map[num1.unit][num2.unit];
         return abs(dist) < EPS;
     }
     bool operator >=(const NumberWithUnits num1,const NumberWithUnits num2){
-        return (num1 == num2) || num1.number > (num2.number / compare_map[num1.unit][num2.unit]);
+        return num1 > num2 || num1 == num2;
     }
     bool operator >(const NumberWithUnits num1,const NumberWithUnits num2){
-        return !(num1==num2) && num1.number > (num2.number / compare_map[num1.unit][num2.unit]);
+        return !(num1==num2) && num1.number > (num2.number * compare_map[num1.unit][num2.unit]);
     }
     bool operator <(const NumberWithUnits num1,const NumberWithUnits num2){
-        return !(num1==num2) && num1.number < (num2.number / compare_map[num1.unit][num2.unit]);
+        return !(num1 >= num2);
     }
     bool operator <=(const NumberWithUnits num1,const NumberWithUnits num2){
-        return (num1 == num2) || num1.number <= (num2.number / compare_map[num1.unit][num2.unit]);
+        return num1 < num2 || num1 == num2;
     }
     bool operator !=(const NumberWithUnits num1,const NumberWithUnits num2){
         return !(num1 == num2);
@@ -188,13 +126,10 @@ cout<<endl<<endl;
 // ++num
     NumberWithUnits& NumberWithUnits::operator ++(){
         ++(this->number);
-        cout<<endl;
         return *this;
     }  
 // num++
     NumberWithUnits NumberWithUnits::operator ++(int){
-        NumberWithUnits old = *this;
-        // this->number++;
         return NumberWithUnits(this->number++,this->unit);
     } 
     NumberWithUnits& NumberWithUnits::operator --(){
@@ -202,9 +137,7 @@ cout<<endl<<endl;
         return *this;
     }
     NumberWithUnits NumberWithUnits::operator --(int){
-        NumberWithUnits old = *this;
-        this->number--;
-        return old;
+        return NumberWithUnits(this->number--, this->unit);
         }
 
     NumberWithUnits NumberWithUnits::operator *(const double num){//is that true?
@@ -223,17 +156,7 @@ cout<<endl<<endl;
         string str,unit;
         char c;
         double number;
-       /*
-        string s;
-        ostringstream os;
-        os << in.rdbuf();
-        s = os.str();
-        */
-        // cout << s << endl;
-        // in2 >> origin;
        
-
-        // cout << origin <<endl;
         if( !(in >> number))throw invalid_argument("invalid argument: \n\"" "  dosnt start with a number!");
         if( !(in >> c)||(c!='[')) throw invalid_argument("invalid argument:\n\""  "\" after the number should have a '['" );
         
@@ -245,53 +168,11 @@ cout<<endl<<endl;
             unit = str;
             if(!(in >> c)||(c!=']')) throw invalid_argument("invalid argument:\n\"" "\" after the unit should have a ']'" );
         }
-        if(compare_map.find(unit)==compare_map.end())throw invalid_argument("shuld be a unit");
-
+        if(compare_map.find(unit) == compare_map.end()) throw invalid_argument("shuld be a unit");
         // if(in >> str) throw invalid_argument("overmuch arguments: after the ']' should be not argument! but -> "+str);
         num.number = number;
         num.unit = unit;
   
-/*
-
-        if(in.good()){ cout << "good" << endl;}
-        cout<<num.number<<endl;
-       
-        cout << in.str()<<endl;
-        in >> c;
-        cout<<c<<endl;
-        
-        cout << in.str()<<endl;
-
-        in >> str;
-        cout<<str<<endl;
-        in >> str;
-        cout <<str <<endl;
-
-        size_t i = 0;
-
-        while(i<str.length() && str.at(i)!='[')
-        {
-            if(str.at(i)>='0' && str.at(i) <= '9'){
-                number += str.at(i);
-            }else{
-                if(str.at(i)!=' ')  throw std::invalid_argument(("invalid argument: "+str));
-            }
-            i++;
-        }
-        while(i<str.length() && str.at(i)!=']'){
-            //if(str.at(i) != ' '){
-                unit += str.at(i);
-           // }
-            i++;
-        }
-        cout << str << endl;
-        while(i < str.length()) { if(str.at(i)!=' ') throw std::invalid_argument(("to many argument: "+str)); }
-        
-        stringstream s(number);
-        s >> num.number;
-
-        num.unit = unit+"";
-        */
         return in;
     }
     
@@ -313,12 +194,5 @@ cout<<endl<<endl;
         cout<<endl;
     }
     }
-    
-    bool compare(const NumberWithUnits num1,const NumberWithUnits num2,int){
-        // cout << num1 << " "<<num2<<" "<< compare_map[num1.unit][num2.unit]<<endl;
-        return compare_map[num1.unit][num2.unit] != 0; 
-    }
-    double compare(const NumberWithUnits num1,const NumberWithUnits num2){
-        return (num1.number - (num2.number/compare_map[num1.unit][num2.unit] ));
-    }
+
 }
