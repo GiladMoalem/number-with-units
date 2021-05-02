@@ -20,7 +20,7 @@ int main() {
  
   NumberWithUnits a{2, "km"};   // 2 kilometers
   cout << a << endl;           // Prints "2[km]".
-  cout << (a--) << endl;    // Prints "-2[km]"   
+  cout << (-a) << endl;    // Prints "-2[km]"   
   cout << (3*a) << endl;    // Prints "6[km]"      
 
   NumberWithUnits b{300, "m"};  // 300 meters
@@ -33,6 +33,7 @@ int main() {
   cout << (a==NumberWithUnits{2000, "m"}) << endl;  // Prints "true"
 
   istringstream sample_input{" 700[ kg ] "};
+  sample_input >> a;
   try{sample_input >> a;
   }catch(const std::exception& ex){
     cout << ex.what() << endl; // Prints "Units do not match - [m] cannot be converted to [kg]"
